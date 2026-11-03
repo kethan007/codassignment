@@ -31,7 +31,9 @@ modules:
   aludec:      {source_files: [ALU_Decoder/rtl.sv]}
   controller:  {source_files: [Control_Unit/rtl.sv]}
   alu:         {source_files: [ALU/rtl.sv]}
-  mux3:        {source_files: [3to1_Multiplexer/rtl.sv]}
+ mux3:
+  source_files: [3to1_Multiplexer/rtl.sv]
+  params: {WIDTH: WIDTH}
   datapath:    {source_files: [Datapath/rtl.sv]}
   riscvsingle: {source_files: [RISCV_Wrapper/rtl.sv]}
   dmem:        {source_files: [DMEM/rtl.sv]}
