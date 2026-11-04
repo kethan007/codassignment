@@ -1,27 +1,32 @@
-module regfile(
+module register_file (
+    input  logic [4:0]  rs1_sel,
+    input  logic [4:0]  rs2_sel,
+    input  logic        reg_write,
     input  logic        clk,
-    input  logic        we3,
-    input  logic [4:0]  a1,
-    input  logic [4:0]  a2,
-    input  logic [4:0]  a3,
-    input  logic [31:0] wd3,
-    output logic [31:0] rd1,
-    output logic [31:0] rd2
+    input  logic        reset,
+    input  logic [31:0] wb_data,
+    input  logic [4:0]  rd_sel,
+    output logic [31:0] rs1_data,
+    output logic [31:0] rs2_data
 );
 
-    logic [31:0] rf [0:31];
+    logic [31:0] registers [0:31];
+    integer i;
 
-    // x0 is hardwired to zero; writes to it are ignored.
-    always_ff @(posedge clk) begin
-        if (we3 && (a3 != 5'd0)) begin
-            rf[a3] <= wd3;
+    // Asynchronous active-high reset clears all 32 registers.
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            for (i = 0; i < 32; i = i + 1)
+                registers[i] <= 32'b0;
+        end else if (reg_write && (rd_sel != 5'd0)) begin
+            registers[rd_sel] <= wb_data;
         end
     end
 
-    // Two asynchronous (combinational) read ports.
+    // Two asynchronous read ports. x0 always reads as zero.
     always_comb begin
-        rd1 = (a1 == 5'd0) ? 32'b0 : rf[a1];
-        rd2 = (a2 == 5'd0) ? 32'b0 : rf[a2];
+        rs1_data = (rs1_sel == 5'd0) ? 32'b0 : registers[rs1_sel];
+        rs2_data = (rs2_sel == 5'd0) ? 32'b0 : registers[rs2_sel];
     end
 
 endmodule
